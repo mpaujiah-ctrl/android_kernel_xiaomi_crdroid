@@ -15,6 +15,10 @@
 #include "manager/manager_identity.h"
 #include "manager/throne_tracker.h"
 
+#ifndef KSU_MAX_PACKAGE_NAME
+#define KSU_MAX_PACKAGE_NAME 256
+#endif
+
 uid_t ksu_manager_appid = KSU_INVALID_APPID;
 
 #define SYSTEM_PACKAGES_LIST_PATH "/data/system/packages.list"
