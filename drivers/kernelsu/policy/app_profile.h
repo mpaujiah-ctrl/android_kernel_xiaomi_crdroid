@@ -1,6 +1,10 @@
 #ifndef __KSU_H_APP_PROFILE
 #define __KSU_H_APP_PROFILE
 
+#ifndef KSU_MAX_PACKAGE_NAME
+#define KSU_MAX_PACKAGE_NAME 256
+#endif
+
 #include "uapi/app_profile.h"
 #include "linux/init.h"
 
