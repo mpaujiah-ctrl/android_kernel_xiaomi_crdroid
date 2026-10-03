@@ -1,0 +1,17 @@
+name: Extract SUSFS glue
+on: workflow_dispatch
+jobs:
+  x:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 16.0
+      - run: |
+          grep -rl -i susfs drivers/kernelsu
+          grep -rn -i -B4 -A10 susfs drivers/kernelsu > susfs-glue.txt || true
+          wc -l susfs-glue.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: susfs-glue
+          path: susfs-glue.txt
