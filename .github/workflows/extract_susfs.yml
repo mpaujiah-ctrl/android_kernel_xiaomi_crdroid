@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 16.0
+          ref: "16.0"
       - run: |
           grep -rl -i susfs drivers/kernelsu
           grep -rn -i -B4 -A10 susfs drivers/kernelsu > susfs-glue.txt || true
