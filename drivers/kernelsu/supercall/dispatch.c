@@ -4,6 +4,11 @@
 #include <linux/string.h>
 #include <linux/uaccess.h>
 #include <linux/version.h>
+#ifdef CONFIG_KSU_SUSFS
+#include <linux/namei.h>
+#include <linux/susfs.h>
+#include "objsec.h"
+#endif // #ifdef CONFIG_KSU_SUSFS
 #include <linux/thread_info.h>
 
 #include "uapi/supercall.h"
@@ -135,6 +140,9 @@ static int do_report_event(void __user *arg)
 			} else {
 				pr_info("boot_complete triggered\n");
 				on_boot_completed();
+#ifdef CONFIG_KSU_SUSFS
+				susfs_start_sdcard_monitor_fn();
+#endif // #ifdef CONFIG_KSU_SUSFS
 			}
 		}
 		break;
