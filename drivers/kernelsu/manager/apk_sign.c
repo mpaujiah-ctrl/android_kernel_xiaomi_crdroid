@@ -23,6 +23,10 @@
 #include "uapi/app_profile.h"
 #include "klog.h" // IWYU pragma: keep
 
+#ifndef KSU_MAX_PACKAGE_NAME
+#define KSU_MAX_PACKAGE_NAME 256
+#endif
+
 struct sdesc {
 	struct shash_desc shash;
 	char ctx[];
