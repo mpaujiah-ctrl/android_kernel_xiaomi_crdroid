@@ -3,7 +3,7 @@
 
 #include <linux/types.h>
 #include <linux/uidgid.h>
-#include "app_profile.h"
+#include "uapi/app_profile.h"
 
 #define PER_USER_RANGE 100000
 #define WEBVIEW_ZYGOTE_UID 1053
