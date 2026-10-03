@@ -9,6 +9,10 @@
 #include <linux/types.h>
 #include <linux/version.h>
 
+#ifndef KSU_MAX_PACKAGE_NAME
+#define KSU_MAX_PACKAGE_NAME 256
+#endif
+
 #include "policy/allowlist.h"
 #include "manager/apk_sign.h"
 #include "klog.h" // IWYU pragma: keep
