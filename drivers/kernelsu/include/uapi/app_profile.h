@@ -48,6 +48,10 @@ struct app_profile {
     __s32 curr_uid;
     bool allow_su;
 
+    /* Menambahkan alias langsung agar kompatibel dengan pemanggilan bawaan policy/ */
+    struct root_profile rp;
+    struct non_root_profile nrp;
+
     union {
         struct {
             bool use_default;
