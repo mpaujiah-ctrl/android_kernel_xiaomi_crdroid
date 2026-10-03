@@ -72,7 +72,7 @@ MDIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 # Check if this is a git repository
 # Try to detect Git repo intelligently
-KSU_GIT_VERSION := 2987
+KSU_GIT_VERSION := 3005
 KSU_GIT_TAG := v3.4.0
 KSU_GIT_VERSION_VALID := 1
 
