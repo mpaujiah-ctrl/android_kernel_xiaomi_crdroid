@@ -2,10 +2,7 @@ name: Build Cepheus Kernel
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - 16.0
-
+ 
 permissions:
   contents: read
 
@@ -81,7 +78,9 @@ jobs:
 
           test -s "$OUT/.config"
 
-          scripts/config --file "$OUT/.config" -d LTO_CLANG
+          scripts/config --file out/.config \
+            -d LTO_CLANG -d CFI_CLANG -d CFI_CLANG_SHADOW \
+            --set-val LTO_NONE y
           make O="$OUT" ARCH="$ARCH" LLVM=1 LLVM_IAS=1 olddefconfig
 
           echo "Final Cepheus configuration:"
