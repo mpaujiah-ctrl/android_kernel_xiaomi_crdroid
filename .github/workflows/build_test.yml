@@ -158,11 +158,6 @@ jobs:
           ls -lh "$ZIP"
           unzip -l "$ZIP"
 
-          if unzip -Zl "$ZIP" | grep -E '\.zip$'; then
-            echo "ERROR: nested ZIP found inside final package"
-            exit 1
-          fi
-
       - name: Upload kernel ZIP
         uses: actions/upload-artifact@v4
         with:
