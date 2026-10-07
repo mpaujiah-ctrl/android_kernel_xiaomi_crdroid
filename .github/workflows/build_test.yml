@@ -1,0 +1,173 @@
+name: Build Cepheus Kernel
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 17.0
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Xiaomi Cepheus
+    runs-on: ubuntu-24.04
+
+    env:
+      ARCH: arm64
+      SUBARCH: arm64
+      KERNEL_DEFCONFIG: vendor/sm8150-perf_defconfig
+      KERNEL_COMMON_CONFIG: vendor/xiaomi/sm8150-common.config
+      KERNEL_DEVICE_CONFIG: vendor/xiaomi/cepheus.config
+      CLANG_VERSION: clang-r596125
+      ZIP_NAME: Cepheus_A17_4.14.zip
+
+    steps:
+      - name: Checkout kernel source
+        uses: actions/checkout@v4
+        with:
+          ref: 17.0
+          fetch-depth: 1
+          path: kernel
+
+      - name: Checkout AnyKernel3
+        uses: actions/checkout@v4
+        with:
+          repository: mpaujiah-ctrl/Anykernel3_cepheus
+          ref: main
+          fetch-depth: 1
+          path: AnyKernel3
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bc bison flex libelf-dev libssl-dev python3 rsync cpio zip unzip curl
+
+      - name: Install Android Clang
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/clang"
+          curl -L --fail --retry 3 \
+            "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main-kernel/${CLANG_VERSION}.tar.gz" \
+            -o "$RUNNER_TEMP/${CLANG_VERSION}.tar.gz"
+          tar -xzf "$RUNNER_TEMP/${CLANG_VERSION}.tar.gz" -C "$RUNNER_TEMP/clang"
+          test -x "$RUNNER_TEMP/clang/bin/clang"
+          test -x "$RUNNER_TEMP/clang/bin/ld.lld"
+          echo "$RUNNER_TEMP/clang/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/clang/bin/clang" --version
+          "$RUNNER_TEMP/clang/bin/ld.lld" --version | head -n 1
+
+      - name: Prepare Cepheus configuration
+        working-directory: kernel
+        run: |
+          set -euo pipefail
+          OUT="$GITHUB_WORKSPACE/kernel/out"
+          MERGE="scripts/kconfig/merge_config.sh"
+
+          rm -rf "$OUT"
+          mkdir -p "$OUT"
+
+          test -f "arch/arm64/configs/${KERNEL_DEFCONFIG}"
+          test -f "arch/arm64/configs/${KERNEL_COMMON_CONFIG}"
+          test -f "arch/arm64/configs/${KERNEL_DEVICE_CONFIG}"
+          test -x "$MERGE" || chmod +x "$MERGE"
+
+          "$MERGE" -m -O "$OUT" \
+            "arch/arm64/configs/${KERNEL_DEFCONFIG}" \
+            "arch/arm64/configs/${KERNEL_COMMON_CONFIG}" \
+            "arch/arm64/configs/${KERNEL_DEVICE_CONFIG}"
+
+          test -s "$OUT/.config"
+
+          make O="$OUT" ARCH="$ARCH" LLVM=1 LLVM_IAS=1 olddefconfig
+
+          echo "Final Cepheus configuration:"
+          grep -E '^(CONFIG_MACH_XIAOMI_CEPHEUS|CONFIG_TOUCHSCREEN_ST_FTS_V521|CONFIG_FTS_FOD_AREA_REPORT|CONFIG_BUILD_ARM64_DT_OVERLAY)=' "$OUT/.config"
+
+          test "$(grep -c '^CONFIG_MACH_XIAOMI_CEPHEUS=y$' "$OUT/.config")" -eq 1
+          test "$(grep -c '^CONFIG_TOUCHSCREEN_ST_FTS_V521=y$' "$OUT/.config")" -eq 1
+          test "$(grep -c '^CONFIG_FTS_FOD_AREA_REPORT=y$' "$OUT/.config")" -eq 1
+          test "$(grep -c '^CONFIG_BUILD_ARM64_DT_OVERLAY=y$' "$OUT/.config")" -eq 1
+
+      - name: Build kernel
+        working-directory: kernel
+        run: |
+          set -euo pipefail
+          OUT="$GITHUB_WORKSPACE/kernel/out"
+          JOBS="$(nproc)"
+
+          make O="$OUT" ARCH="$ARCH" SUBARCH="$SUBARCH" LLVM=1 LLVM_IAS=1 \
+            -j"$JOBS" Image.gz-dtb
+
+          test -f "$OUT/arch/arm64/boot/Image.gz-dtb"
+          ls -lh "$OUT/arch/arm64/boot/Image.gz-dtb"
+
+      - name: Prepare AnyKernel3 package
+        run: |
+          set -euo pipefail
+          OUT="$GITHUB_WORKSPACE/kernel/out"
+          PACKAGE="$OUT/AnyKernel3"
+
+          rm -rf "$PACKAGE"
+          mkdir -p "$PACKAGE"
+          cp -a "$GITHUB_WORKSPACE/AnyKernel3/." "$PACKAGE/"
+
+          rm -rf "$PACKAGE/.git" "$PACKAGE/.github"
+          find "$PACKAGE" -type f -name '*placeholder*' -delete
+
+          rm -f "$PACKAGE"/Image "$PACKAGE"/Image.gz "$PACKAGE"/Image.gz-dtb \
+                "$PACKAGE"/Image-dtb "$PACKAGE"/zImage "$PACKAGE"/zImage-dtb \
+                "$PACKAGE"/*.zip
+
+          cp "$OUT/arch/arm64/boot/Image.gz-dtb" "$PACKAGE/Image.gz-dtb"
+
+          test -f "$PACKAGE/anykernel.sh"
+          grep -q 'device.name1=cepheus' "$PACKAGE/anykernel.sh"
+          grep -q 'IS_SLOT_DEVICE=0' "$PACKAGE/anykernel.sh"
+          grep -q 'supported.versions=17' "$PACKAGE/anykernel.sh"
+
+          if find "$PACKAGE" -type f -name '*.zip' -print -quit | grep -q .; then
+            echo "ERROR: nested ZIP detected in AnyKernel payload"
+            exit 1
+          fi
+
+          if find "$PACKAGE" -type d \( -name .git -o -name .github \) -print -quit | grep -q .; then
+            echo "ERROR: Git metadata detected in AnyKernel payload"
+            exit 1
+          fi
+
+      - name: Create single flashable ZIP
+        run: |
+          set -euo pipefail
+          OUT="$GITHUB_WORKSPACE/kernel/out"
+          PACKAGE="$OUT/AnyKernel3"
+          ZIP="$GITHUB_WORKSPACE/${ZIP_NAME}"
+
+          rm -f "$ZIP"
+          (
+            cd "$PACKAGE"
+            zip -r9 "$ZIP" . \
+              -x '.git/*' -x '.github/*' -x 'README.md' \
+              -x '*placeholder*' -x '*.zip'
+          )
+
+          unzip -t "$ZIP" >/dev/null
+          echo "Created flashable ZIP:"
+          ls -lh "$ZIP"
+          unzip -l "$ZIP"
+
+          if unzip -l "$ZIP" | grep -E '\.zip$'; then
+            echo "ERROR: nested ZIP found inside final package"
+            exit 1
+          fi
+
+      - name: Upload kernel ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ZIP_NAME }}
+          path: ${{ env.ZIP_NAME }}
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
