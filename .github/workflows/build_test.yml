@@ -81,6 +81,7 @@ jobs:
 
           test -s "$OUT/.config"
 
+          scripts/config --file "$OUT/.config" -d LTO_CLANG
           make O="$OUT" ARCH="$ARCH" LLVM=1 LLVM_IAS=1 olddefconfig
 
           echo "Final Cepheus configuration:"
