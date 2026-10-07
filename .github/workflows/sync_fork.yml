@@ -9,22 +9,9 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - run: gh repo sync ${{ github.repository }} --branch 16.0
+      - name: Sync mirror branches
         env:
           GH_TOKEN: ${{ github.token }}
-
-      - run: |
-          # 1. Amankan commit Anda di branch baru
-          git checkout 16.0
-          git checkout -b 16.0-custom
-          git push origin 16.0-custom
-          
-          # 2. Tarik branch 17 sebagai mirror murni
-          git remote add upstream https://github.com/crdroidandroid/android_kernel_xiaomi_sm8150.git
-          git fetch upstream
-          git push origin upstream/17:refs/heads/17
-          
-          # 3. Buat branch kerja 17 dan bawa commit audio saja
-          git checkout -b 17.0-custom origin/17
-          git cherry-pick <hash-commit-audio>
-          git push origin 17.0-custom
+        run: |
+          gh repo sync ${{ github.repository }} --branch 17
+          gh repo sync ${{ github.repository }} --branch 16.0
