@@ -18,7 +18,7 @@ jobs:
       KERNEL_COMMON_CONFIG: vendor/xiaomi/sm8150-common.config
       KERNEL_DEVICE_CONFIG: vendor/xiaomi/cepheus.config
       CLANG_VERSION: clang-r596125
-      ZIP_NAME: Cepheus_A17.zip
+      ZIP_NAME: Cepheus_A17
 
     steps:
       - name: Checkout kernel source
@@ -126,7 +126,7 @@ jobs:
           test -f "$PACKAGE/anykernel.sh"
           grep -q 'device.name1=cepheus' "$PACKAGE/anykernel.sh"
           grep -q 'IS_SLOT_DEVICE=0' "$PACKAGE/anykernel.sh"
-          grep -q 'supported.versions=17' "$PACKAGE/anykernel.sh"
+          grep -q 'supported.versions=16' "$PACKAGE/anykernel.sh"
 
           if find "$PACKAGE" -type f -name '*.zip' -print -quit | grep -q .; then
             echo "ERROR: nested ZIP detected in AnyKernel payload"
