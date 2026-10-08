@@ -18,7 +18,7 @@ jobs:
       KERNEL_COMMON_CONFIG: vendor/xiaomi/sm8150-common.config
       KERNEL_DEVICE_CONFIG: vendor/xiaomi/cepheus.config
       CLANG_VERSION: clang-r596125
-      ZIP_NAME: Cepheus_A17_4.14
+      ZIP_NAME: Cepheus_A17.zip
 
     steps:
       - name: Checkout kernel source
