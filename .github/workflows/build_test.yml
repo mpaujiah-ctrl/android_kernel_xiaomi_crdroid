@@ -18,7 +18,7 @@ jobs:
       KERNEL_COMMON_CONFIG: vendor/xiaomi/sm8150-common.config
       KERNEL_DEVICE_CONFIG: vendor/xiaomi/cepheus.config
       CLANG_VERSION: clang-r596125
-      ZIP_NAME: Cepheus_A17_4.14.zip
+      ZIP_NAME: Cepheus_A17_4.14
 
     steps:
       - name: Checkout kernel source
@@ -144,7 +144,6 @@ jobs:
           OUT="$GITHUB_WORKSPACE/kernel/out"
           PACKAGE="$OUT/AnyKernel3"
           ZIP="$GITHUB_WORKSPACE/${ZIP_NAME}"
-
           rm -f "$ZIP"
           (
             cd "$PACKAGE"
@@ -152,11 +151,14 @@ jobs:
               -x '.git/*' -x '.github/*' -x 'README.md' \
               -x '*placeholder*' -x '*.zip'
           )
-
           unzip -t "$ZIP" >/dev/null
           echo "Created flashable ZIP:"
           ls -lh "$ZIP"
           unzip -l "$ZIP"
+          if unzip -l "$ZIP" | grep -E '\.zip$'; then
+            echo "ERROR: nested ZIP found inside final package"
+            exit 1
+          fi
 
       - name: Upload kernel ZIP
         uses: actions/upload-artifact@v4
