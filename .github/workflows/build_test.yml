@@ -24,7 +24,7 @@ jobs:
       - name: Checkout kernel source
         uses: actions/checkout@v4
         with:
-          ref: "17.0"
+          ref: "17.0-exp"
           fetch-depth: 1
           path: kernel
 
