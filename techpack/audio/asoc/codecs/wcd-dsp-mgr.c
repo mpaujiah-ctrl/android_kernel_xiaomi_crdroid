@@ -451,8 +451,11 @@ dload_error:
 		wdsp_broadcast_event_downseq(wdsp, post, NULL);
 		ret = 0;
 	} else
-#endif
+		wdsp_broadcast_event_downseq(wdsp, WDSP_EVENT_DLOAD_FAILED, NULL);
+	}
+#else
 	wdsp_broadcast_event_downseq(wdsp, WDSP_EVENT_DLOAD_FAILED, NULL);
+#endif
 	return ret;
 }
 
