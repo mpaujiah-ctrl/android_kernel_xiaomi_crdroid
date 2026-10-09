@@ -155,6 +155,7 @@ jobs:
           echo "Created flashable ZIP:"
           ls -lh "$ZIP"
           unzip -l "$ZIP"
+          unzip -l "$ZIP"
           if unzip -l "$ZIP" | grep -E '\.zip$'; then
             echo "ERROR: nested ZIP found inside final package"
             exit 1
