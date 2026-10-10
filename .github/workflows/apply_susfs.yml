@@ -12,7 +12,7 @@ jobs:
           ref: 16.0-exp-2
       - name: Replace drivers/kernelsu
         run: |            
-          git apply -p2 --directory=drivers/kernelsu patches/ksun-3.4.0-legacy-susfs.patch
+          apply -p2 --directory=drivers/kernelsu patches/ksun-3.4.0-legacy-susfs.patch
      
       - name: Commit
         run: |
