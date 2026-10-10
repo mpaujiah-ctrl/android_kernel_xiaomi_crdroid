@@ -176,3 +176,5 @@ config KSU_SUSFS_SUS_MEMFD
         - Allow preventing the user-defined memfd name from being created
 
 endmenu
+
+endmenu
