@@ -12,7 +12,7 @@ jobs:
           ref: 16.0-exp-2
       - name: Replace drivers/kernelsu
         run: |
-            git clone --depth 1 --branch v3.4.1-legacy https://github.com/KernelSU-Next/KernelSU-Next.git /tmp/ksun
+            git clone --depth 1 --branch legacy https://github.com/KernelSU-Next/KernelSU-Next.git /tmp/ksun
             rm -rf drivers/kernelsu
             mkdir -p drivers/kernelsu
             cp -a /tmp/ksun/kernel/. drivers/kernelsu/
