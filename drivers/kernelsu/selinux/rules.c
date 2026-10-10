@@ -278,6 +278,14 @@ do_stop_machine:
 out_flush:
 	smp_mb();
 	reset_avc_cache();
+#ifdef CONFIG_KSU_SUSFS
+    // Allow umount in zygote process without installing zygisk
+    //ksu_allow(db, "zygote", "labeledfs", "filesystem", "unmount");
+    susfs_set_priv_app_sid();
+    susfs_set_init_sid();
+    susfs_set_ksu_sid();
+    susfs_set_zygote_sid();
+#endif // #ifdef CONFIG_KSU_SUSFS
 #endif
 }
 
@@ -354,7 +362,7 @@ static int sepol_require_not_all(const char *value, const char *name)
     return -EINVAL;
 }
 
-int sepol_expected_argc(u32 cmd)
+static int sepol_expected_argc(u32 cmd)
 {
     switch (cmd) {
     case KSU_SEPOLICY_CMD_NORMAL_PERM:
