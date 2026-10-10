@@ -22,24 +22,19 @@
 #include "selinux/selinux.h"
 #include "feature/selinux_hide.h"
 #include "feature/adb_root.h"
+#ifdef CONFIG_KSU_SUSFS
+#include <linux/susfs.h>
+#endif // #ifdef CONFIG_KSU_SUSFS
 
 extern void __init ksu_lsm_hook_init(void);
 extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
 					void *argv, void *envp, int *flags);
-
-/*
- * The manual call site in fs/exec.c (__do_execve_file) already hands us
- * struct user_arg_ptr values, so pass them straight through with their real
- * type. Declaring the parameter as void* here while ksud_integration.c
- * defines it as struct user_arg_ptr* is a conflicting declaration of the
- * same symbol.
- */
+extern int ksu_handle_execveat_ksud(int *fd, struct filename **filename_ptr,
+				    void *argv, void *envp, int *flags);
 int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
 			void *envp, int *flags)
 {
-	ksu_handle_execveat_ksud(fd, filename_ptr,
-				 (struct user_arg_ptr *)argv,
-				 (struct user_arg_ptr *)envp, flags);
+	ksu_handle_execveat_ksud(fd, filename_ptr, argv, envp, flags);
 	return ksu_handle_execveat_sucompat(fd, filename_ptr, argv, envp,
 					    flags);
 }
@@ -101,11 +96,6 @@ module_param_named(bundled, ksu_bundled, bool, 0);
 
 int __init kernelsu_init(void)
 {
-#ifdef KSU_MANAGER_PACKAGE
-	pr_info("welcome to KernelSU version " __stringify(KERNEL_SU_VERSION) ", package name " KSU_MANAGER_PACKAGE "\n");
-#else
-	pr_info("welcome to KernelSU version " __stringify(KERNEL_SU_VERSION) "\n");
-#endif
 #ifdef MODULE
 	ksu_late_loaded = (current->pid != 1);
 #else
@@ -181,6 +171,10 @@ int __init kernelsu_init(void)
 		ksu_allowlist_init();
 
 		ksu_throne_tracker_init();
+
+#ifdef CONFIG_KSU_SUSFS
+		susfs_init();
+#endif // #ifdef CONFIG_KSU_SUSFS
 
 		ksu_ksud_init();
 
