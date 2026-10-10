@@ -12,7 +12,7 @@ jobs:
           ref: 16.0-exp-2
       - name: Replace drivers/kernelsu
         run: |
-            git clone --depth 1 --branch v3.4.1 https://github.com/KernelSU-Next/KernelSU-Next.git /tmp/ksun
+            git clone --depth 1 --branch v3.4.0-legacy https://github.com/KernelSU-Next/KernelSU-Next.git /tmp/ksun
             rm -rf drivers/kernelsu
             mkdir -p drivers/kernelsu
             cp -a /tmp/ksun/kernel/. drivers/kernelsu/
@@ -27,5 +27,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
           git add -A drivers/kernelsu
-          git commit -m "kernelsu: update KernelSU-Next to v3.4.1" || echo "nothing to commit"
+          git commit -m "kernelsu: update KernelSU-Next to v3.4.0 legacy" || echo "nothing to commit"
           git push
