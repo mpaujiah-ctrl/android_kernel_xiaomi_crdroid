@@ -1,7 +1,7 @@
-diff --git a/kernel/Kbuild b/kernel/Kbuild
+diff --git a/Kbuild b/Kbuild
 index baa32a37..27c6cbe8 100644
---- a/kernel/Kbuild
-+++ b/kernel/Kbuild
+--- a/Kbuild
++++ b/Kbuild
 @@ -329,4 +329,14 @@ ccflags-y += -DEXPECTED_MANAGER_HASH=\"$(KSU_NEXT_MANAGER_HASH)\"
  ccflags-y += -Wno-strict-prototypes -Wno-int-conversion -Wno-gcc-compat -Wno-missing-prototypes
  ccflags-y += -Wno-declaration-after-statement -Wno-unused-function -Wno-unused-variable
@@ -17,10 +17,10 @@ index baa32a37..27c6cbe8 100644
 +endif
 +
  # Keep a new line here!! Because someone may append config
-diff --git a/kernel/Kconfig b/kernel/Kconfig
+diff --git a/Kconfig b/Kconfig
 index 946966dc..6526ec99 100644
---- a/kernel/Kconfig
-+++ b/kernel/Kconfig
+--- a/Kconfig
++++ b/Kconfig
 @@ -72,4 +72,109 @@ config KSU_SYSCALL_TABLE_HOOK
  
  endchoice
@@ -131,10 +131,10 @@ index 946966dc..6526ec99 100644
 +endmenu
 +
  endmenu
-diff --git a/kernel/core/init.c b/kernel/core/init.c
+diff --git a/core/init.c b/core/init.c
 index 2359678b..972d8596 100644
---- a/kernel/core/init.c
-+++ b/kernel/core/init.c
+--- a/core/init.c
++++ b/core/init.c
 @@ -22,6 +22,9 @@
  #include "selinux/selinux.h"
  #include "feature/selinux_hide.h"
@@ -156,10 +156,10 @@ index 2359678b..972d8596 100644
  		ksu_ksud_init();
  
  		ksu_file_wrapper_init();
-diff --git a/kernel/feature/kernel_umount.c b/kernel/feature/kernel_umount.c
+diff --git a/feature/kernel_umount.c b/feature/kernel_umount.c
 index 275dde8d..079a5515 100644
---- a/kernel/feature/kernel_umount.c
-+++ b/kernel/feature/kernel_umount.c
+--- a/feature/kernel_umount.c
++++ b/feature/kernel_umount.c
 @@ -22,7 +22,11 @@
  #include "ksu.h"
  #include "compat/kernel_compat.h"
@@ -200,10 +200,10 @@ index 275dde8d..079a5515 100644
  
  void __init ksu_kernel_umount_init(void)
  {
-diff --git a/kernel/feature/kernel_umount.h b/kernel/feature/kernel_umount.h
+diff --git a/feature/kernel_umount.h b/feature/kernel_umount.h
 index e5448955..e19ba08e 100644
---- a/kernel/feature/kernel_umount.h
-+++ b/kernel/feature/kernel_umount.h
+--- a/feature/kernel_umount.h
++++ b/feature/kernel_umount.h
 @@ -8,8 +8,10 @@
  void ksu_kernel_umount_init(void);
  void ksu_kernel_umount_exit(void);
@@ -215,10 +215,10 @@ index e5448955..e19ba08e 100644
  
  // for the umount list
  struct mount_entry {
-diff --git a/kernel/hook/setuid_hook.c b/kernel/hook/setuid_hook.c
+diff --git a/hook/setuid_hook.c b/hook/setuid_hook.c
 index 3184deb2..a5ec5ecd 100644
---- a/kernel/hook/setuid_hook.c
-+++ b/kernel/hook/setuid_hook.c
+--- a/hook/setuid_hook.c
++++ b/hook/setuid_hook.c
 @@ -21,13 +21,86 @@
  #include "hook/hook_manager.h"
  #include "feature/kernel_umount.h"
@@ -353,10 +353,10 @@ index 3184deb2..a5ec5ecd 100644
  }
  
  void __init ksu_setuid_hook_init(void)
-diff --git a/kernel/selinux/rules.c b/kernel/selinux/rules.c
+diff --git a/selinux/rules.c b/selinux/rules.c
 index 14e4480d..291635c5 100644
---- a/kernel/selinux/rules.c
-+++ b/kernel/selinux/rules.c
+--- a/selinux/rules.c
++++ b/selinux/rules.c
 @@ -278,6 +278,14 @@ do_stop_machine:
  out_flush:
  	smp_mb();
@@ -372,10 +372,10 @@ index 14e4480d..291635c5 100644
  #endif
  }
  
-diff --git a/kernel/selinux/selinux.c b/kernel/selinux/selinux.c
+diff --git a/selinux/selinux.c b/selinux/selinux.c
 index 36f1677f..7b8dd2b1 100644
---- a/kernel/selinux/selinux.c
-+++ b/kernel/selinux/selinux.c
+--- a/selinux/selinux.c
++++ b/selinux/selinux.c
 @@ -255,6 +255,102 @@ bool is_init(const struct cred *cred)
      return is_sid_match(cred, cached_init_sid, INIT_CONTEXT);
  }
@@ -479,10 +479,10 @@ index 36f1677f..7b8dd2b1 100644
  void escape_to_root_for_adb_root(void)
  {
      struct cred *cred = prepare_creds();
-diff --git a/kernel/selinux/selinux.h b/kernel/selinux/selinux.h
+diff --git a/selinux/selinux.h b/selinux/selinux.h
 index 99e513b7..c8a0944e 100644
---- a/kernel/selinux/selinux.h
-+++ b/kernel/selinux/selinux.h
+--- a/selinux/selinux.h
++++ b/selinux/selinux.h
 @@ -65,4 +65,17 @@ void escape_to_root_for_adb_root();
  
  extern u32 ksu_file_sid;
@@ -501,10 +501,10 @@ index 99e513b7..c8a0944e 100644
 +#endif // #ifdef CONFIG_KSU_SUSFS
 +
  #endif
-diff --git a/kernel/supercall/dispatch.c b/kernel/supercall/dispatch.c
+diff --git a/supercall/dispatch.c b/supercall/dispatch.c
 index 2d550219..ed6641c3 100644
---- a/kernel/supercall/dispatch.c
-+++ b/kernel/supercall/dispatch.c
+--- a/supercall/dispatch.c
++++ b/supercall/dispatch.c
 @@ -4,6 +4,11 @@
  #include <linux/string.h>
  #include <linux/uaccess.h>
@@ -527,10 +527,10 @@ index 2d550219..ed6641c3 100644
  			}
  		}
  		break;
-diff --git a/kernel/supercall/supercall.c b/kernel/supercall/supercall.c
+diff --git a/supercall/supercall.c b/supercall/supercall.c
 index 1bfa9952..3e41cf17 100644
---- a/kernel/supercall/supercall.c
-+++ b/kernel/supercall/supercall.c
+--- a/supercall/supercall.c
++++ b/supercall/supercall.c
 @@ -11,6 +11,11 @@
  #include <linux/uaccess.h>
  #include <linux/version.h>
