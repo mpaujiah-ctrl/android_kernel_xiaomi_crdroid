@@ -18,7 +18,7 @@ jobs:
       KERNEL_COMMON_CONFIG: vendor/xiaomi/sm8150-common.config
       KERNEL_DEVICE_CONFIG: vendor/xiaomi/cepheus.config
       CLANG_VERSION: clang-r596125
-      LOCAL_VERSION: "-RIJEK24"
+      LOCALVERSION: "-RIJEK24"
       ZIP_NAME: Cepheus_ku341.zip
 
     steps:
