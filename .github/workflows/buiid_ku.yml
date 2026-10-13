@@ -1,4 +1,4 @@
-name: Build Kernelku
+name: Build Kernel 341
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Xiaomi Cepheus
+    name: Build 341
     runs-on: ubuntu-24.04
 
     env:
@@ -18,8 +18,8 @@ jobs:
       KERNEL_COMMON_CONFIG: vendor/xiaomi/sm8150-common.config
       KERNEL_DEVICE_CONFIG: vendor/xiaomi/cepheus.config
       CLANG_VERSION: clang-r596125
-      LOCALVERSION: "-RIJEK24"
-      ZIP_NAME: Cepheus_ku341.zip
+      LOCALVERSION: "-RIJEK-341"
+      ZIP_NAME: Cepheus_341.zip
 
     steps:
       - name: Checkout kernel source
