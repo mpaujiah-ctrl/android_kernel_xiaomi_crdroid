@@ -99,7 +99,7 @@ jobs:
           OUT="$GITHUB_WORKSPACE/kernel/out"
           JOBS="$(nproc)"
 
-          make O="$OUT" ARCH="$ARCH" SUBARCH="$SUBARCH" LLVM=1 LLVM_IAS=1 \
+          make O="$OUT" ARCH="$ARCH" KSU_VERSION=33333 SUBARCH="$SUBARCH" LLVM=1 LLVM_IAS=1 \
             -j"$JOBS" Image.gz-dtb
 
           test -f "$OUT/arch/arm64/boot/Image.gz-dtb"
