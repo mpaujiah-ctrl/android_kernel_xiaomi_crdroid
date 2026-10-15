@@ -156,7 +156,14 @@ jobs:
           echo "Created flashable ZIP:"
           ls -lh "$ZIP"
           unzip -l "$ZIP"
-          
+          ZIPS=$(unzip -l "$ZIP" | awk '{print $4}' | grep '\.zip$' || true)
+
+          if [ -n "$ZIPS" ]; then
+              echo "ERROR: nested ZIP ditemukan:"
+              echo "$ZIPS"
+              exit 1
+          fi
+                    
       - name: Upload kernel ZIP
         uses: actions/upload-artifact@v4
         with:
