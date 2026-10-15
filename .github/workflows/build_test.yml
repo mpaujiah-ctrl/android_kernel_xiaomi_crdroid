@@ -92,6 +92,12 @@ jobs:
           test "$(grep -c '^CONFIG_FTS_FOD_AREA_REPORT=y$' "$OUT/.config")" -eq 1
           test "$(grep -c '^CONFIG_BUILD_ARM64_DT_OVERLAY=y$' "$OUT/.config")" -eq 1
 
+          echo "CC=$CC CROSS_COMPILE=$CROSS_COMPILE"
+          which clang || ls -la <toolchain_dir>/bin | head
+          clang --version
+          echo 'int main(){return 0;}' | clang --target=aarch64-linux-gnu -fstack-protector-strong -x c - -c -o /dev/null && echo OK
+          ldd $(which clang) | grep "not found"
+      
       - name: Build kernel
         working-directory: kernel
         run: |
