@@ -157,9 +157,9 @@ jobs:
           echo "Created flashable ZIP:"
           ls -lh "$ZIP"
           unzip -l "$ZIP"
-          find "$PACKAGE" -name "*.zip" -delete
+          
           ZIPS=$(unzip -l "$ZIP" | awk '{print $4}' | grep '\.zip$' || true)
-
+          find "$PACKAGE" -name "*.zip" -delete
           if [ -n "$ZIPS" ]; then
               echo "ERROR: nested ZIP ditemukan:"
               echo "$ZIPS"
