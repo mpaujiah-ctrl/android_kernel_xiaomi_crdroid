@@ -98,14 +98,10 @@ jobs:
           set -euo pipefail
           OUT="$GITHUB_WORKSPACE/kernel/out"
           JOBS="$(nproc)"
-
-          export PATH="$RUNNER_TEMP/clang/bin:$PATH"
-          make -C kernel O=out ARCH=arm64 LLVM=1 CC=clang \
-            CROSS_COMPILE=aarch64-linux-gnu- V=1 2>&1 \
-            | grep -iE "stack-protector|error|warning: unknown|unsupported" | head -30
-          
+         
           make O="$OUT" ARCH="$ARCH" SUBARCH="$SUBARCH" LLVM=1 LLVM_IAS=1 \
-            -j"$JOBS" Image.gz-dtb
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          -j"$JOBS" Image.gz-dtb
 
           test -f "$OUT/arch/arm64/boot/Image.gz-dtb"
           ls -lh "$OUT/arch/arm64/boot/Image.gz-dtb"
