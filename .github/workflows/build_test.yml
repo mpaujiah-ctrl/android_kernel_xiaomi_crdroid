@@ -91,7 +91,9 @@ jobs:
           test "$(grep -c '^CONFIG_TOUCHSCREEN_ST_FTS_V521=y$' "$OUT/.config")" -eq 1
           test "$(grep -c '^CONFIG_FTS_FOD_AREA_REPORT=y$' "$OUT/.config")" -eq 1
           test "$(grep -c '^CONFIG_BUILD_ARM64_DT_OVERLAY=y$' "$OUT/.config")" -eq 1
-
+      
+      - name: Cek Clang
+        run: |
           echo "CC=$CC CROSS_COMPILE=$CROSS_COMPILE"
           which clang || ls -la <toolchain_dir>/bin | head
           clang --version
