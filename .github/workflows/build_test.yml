@@ -107,6 +107,10 @@ jobs:
           OUT="$GITHUB_WORKSPACE/kernel/out"
           JOBS="$(nproc)"
 
+          export PATH=/home/runner/work/_temp/clang/bin:$PATH
+          which clang
+          make -C <kernel_dir> O=out ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- V=1 2>&1 | grep -iE "stack-protector|error" | head -20
+          
           make O="$OUT" ARCH="$ARCH" SUBARCH="$SUBARCH" LLVM=1 LLVM_IAS=1 \
             -j"$JOBS" Image.gz-dtb
 
