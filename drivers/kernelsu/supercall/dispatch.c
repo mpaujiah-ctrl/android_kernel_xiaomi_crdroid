@@ -137,11 +137,9 @@ static int do_report_event(void __user *arg)
 
 	switch (cmd.event) {
 	case EVENT_POST_FS_DATA: {
-		static atomic_t post_fs_data_lock = ATOMIC_INIT(0);
-
-		if (atomic_cmpxchg(&post_fs_data_lock, 0, 1) == 0) {
-			/* Reset services only when this post-fs-data event wins. */
-			atomic_set(&services_started, 0);
+		static bool post_fs_data_lock = false;
+		if (!post_fs_data_lock) {
+			post_fs_data_lock = true;
 			if (ksu_late_loaded) {
 				pr_info("post-fs-data skipped (late load)\n");
 			} else {
