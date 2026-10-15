@@ -156,6 +156,7 @@ jobs:
           echo "Created flashable ZIP:"
           ls -lh "$ZIP"
           unzip -l "$ZIP"
+          find "$PACKAGE" -name "*.zip" -delete
           ZIPS=$(unzip -l "$ZIP" | awk '{print $4}' | grep '\.zip$' || true)
 
           if [ -n "$ZIPS" ]; then
