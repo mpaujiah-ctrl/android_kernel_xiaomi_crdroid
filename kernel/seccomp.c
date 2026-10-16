@@ -248,33 +248,12 @@ static u32 seccomp_run_filters(const struct seccomp_data *sd,
 	}
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0)
-/*
- * Called with current->sighand->siglock held by KernelSU. Only native
- * AArch64 syscall numbers are cached; compat tasks continue through filters.
- */
-void ksu_seccomp_allow_cache(struct seccomp_filter *filter, int nr)
-{
-	if (filter && nr >= 0 && nr < __NR_syscalls)
-		set_bit(nr, filter->ksu_allow_native);
-}
-EXPORT_SYMBOL_GPL(ksu_seccomp_allow_cache);
-
-void ksu_seccomp_clear_cache(struct seccomp_filter *filter, int nr)
-{
-	if (filter && nr >= 0 && nr < __NR_syscalls)
-		clear_bit(nr, filter->ksu_allow_native);
-}
-EXPORT_SYMBOL_GPL(ksu_seccomp_clear_cache);
-
-static bool seccomp_ksu_cache_allows(const struct seccomp_filter *filter,
-				     const struct seccomp_data *sd)
-{
-	if (sd->arch != AUDIT_ARCH_AARCH64 ||
-	    sd->nr < 0 || sd->nr >= __NR_syscalls)
-		return false;
-
-	return test_bit(sd->nr, filter->ksu_allow_native);
-}
+	/*
+	 * Only an explicitly exempted native syscall may bypass the full filter
+	 * chain. Compat tasks retain normal seccomp enforcement.
+	 */
+	if (seccomp_ksu_cache_allows(f, sd))
+		return SECCOMP_RET_ALLOW;
 #endif
 
 	/*
