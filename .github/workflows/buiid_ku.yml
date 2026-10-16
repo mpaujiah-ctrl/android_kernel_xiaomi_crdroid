@@ -1,4 +1,4 @@
-name: Build Kernel 341
+name: Build Kernel 342
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   build:
-    name: Build 341
+    name: Build 342
     runs-on: ubuntu-24.04
 
     env:
@@ -18,8 +18,8 @@ jobs:
       KERNEL_COMMON_CONFIG: vendor/xiaomi/sm8150-common.config
       KERNEL_DEVICE_CONFIG: vendor/xiaomi/cepheus.config
       CLANG_VERSION: clang-r596125
-      LOCALVERSION: "-RIJEK-341"
-      ZIP_NAME: Cepheus_341.zip
+      LOCALVERSION: "-RIJEK-342"
+      ZIP_NAME: Cepheus_342.zip
 
     steps:
       - name: Checkout kernel source
@@ -156,6 +156,14 @@ jobs:
           echo "Created flashable ZIP:"
           ls -lh "$ZIP"
           unzip -l "$ZIP"
+
+          ZIPS=$(unzip -l "$ZIP" | awk '{print $4}' | grep '\.zip$' || true)
+          find "$PACKAGE" -name "*.zip" -delete
+          if [ -n "$ZIPS" ]; then
+              echo "ERROR: nested ZIP ditemukan:"
+              echo "$ZIPS"
+              exit 1
+          fi
           
       - name: Upload kernel ZIP
         uses: actions/upload-artifact@v4
@@ -163,5 +171,6 @@ jobs:
           name: ${{ env.ZIP_NAME }}
           path: ${{ env.ZIP_NAME }}
           if-no-files-found: error
+          archive: false
           compression-level: 0
           retention-days: 14
